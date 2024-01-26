@@ -1,7 +1,7 @@
 "use client";
 import MainHeading from "../../components/MainHeading";
 import List from "../../components/List";
-import { useEffect, useRef, useState } from "react";
+import React, { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Search from "@/components/Search";
@@ -19,7 +19,16 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function Homepage() {
+const WithSuspense = () => {
+  return (
+    <Suspense fallback={<p>loading...</p>}>
+      <Homepage />
+    </Suspense>
+  );
+};
+export default WithSuspense;
+
+function Homepage(): React.JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [isHeadingVisible, setIsHeadingVisible] = useState(true);
   const [img, setImg] = useState<ImageData | null>(null);
