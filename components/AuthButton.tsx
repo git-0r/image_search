@@ -1,39 +1,35 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default async function AuthButton() {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+export default function AuthButton() {
+  const supabase = createClient();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    supabase.auth
+      .getUser()
+      .then(({ data }) => setUser(data.user))
+      .catch((error) => console.error(error));
+  }, []);
 
   const signOut = async () => {
-    "use server";
-
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
     await supabase.auth.signOut();
-    return redirect("/login");
+    setUser(null);
+    return router.refresh();
   };
 
   return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.email}!
-      <form action={signOut}>
-        <button className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover">
-          Logout
-        </button>
-      </form>
+    <div className="flex items-center gap-4 ml-auto">
+      <button onClick={signOut} className="border-2 border-transparent">
+        Logout
+      </button>
     </div>
   ) : (
-    <Link
-      href="/login"
-      className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
-    >
+    <Link href="/login" className="ml-auto">
       Login
     </Link>
   );
