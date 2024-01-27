@@ -104,7 +104,7 @@ function Homepage(): React.JSX.Element {
           )}
         </QueryClientProvider>
       </motion.div>
-      {img && <ImageCard img={img} showTrigger={false} />}
+      {img && isHeadingVisible && <ImageCard img={img} showTrigger={false} />}
       {user && (
         <Link
           href={"/history"}
